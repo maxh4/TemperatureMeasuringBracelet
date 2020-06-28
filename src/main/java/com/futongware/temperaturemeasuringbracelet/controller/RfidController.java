@@ -12,105 +12,146 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/rfid")
 public class RfidController {
-    @Resource
-    private RfidService rfidService;
+
     private ObjectMapper objectMapper = new ObjectMapper();
 
+    private Map<String, RfidService> connectedReaderMap = new HashMap<>();
+
+    //region BaseOperation
     @RequestMapping("/connect")
     @ResponseBody
     @SneakyThrows
-    public String connectRfid(String ipAddr, Integer antCnt, Boolean connected, HttpSession session) {
-        if (connected) {
-            return objectMapper.writeValueAsString(new RfidResult().setData("connected"));
-        }
-        RfidResult result = rfidService.connectRfid(ipAddr, antCnt);
-        if (result.getErr() == READER_ERR.MT_OK_ERR) {
-            session.setAttribute("connectionStat", true);
-            session.setAttribute("error", null);
-        } else
-            session.setAttribute("error", result.getErr().toString());
+    public RfidResult connectRfid(String ipAddr, Integer antCnt) {
+        if (!connectedReaderMap.containsKey(ipAddr) || connectedReaderMap.get(ipAddr) == null)
+            connectedReaderMap.put(ipAddr, new RfidService());
 
-        return objectMapper.writeValueAsString(result);
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.connectRfid(ipAddr, antCnt);
+        return result;
     }
 
     /**
      * Disconnect RFID Reader
-     * @param session
      * @return
      */
     @RequestMapping("/disconnect")
-    public String disconnectRfid(HttpSession session) {
-        if (session.getAttribute("connectionStat") != null)
-            rfidService.disConnectRfid();
-        session.removeAttribute("connectionStat");
-        return "redirect:/assets/rfid/rfidconf";
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult disconnectRfid(String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        rfidService.disConnectRfid();
+        return new RfidResult();
     }
 
     @RequestMapping("/startInventory")
     @ResponseBody
     @SneakyThrows
-    public String startInventory() {
+    public RfidResult startInventory(String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
         RfidResult result = rfidService.startInventoy();
-        return objectMapper.writeValueAsString(result);
+        return result;
     }
 
     @RequestMapping("/stopInventory")
     @ResponseBody
     @SneakyThrows
-    public String stopInventory() {
+    public RfidResult stopInventory(String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
         RfidResult result = rfidService.stopInventoy();
-        return objectMapper.writeValueAsString(result);
+        return result;
     }
 
     @RequestMapping("/clearInventory")
     @ResponseBody
     @SneakyThrows
-    public String clearInventory() {
-        RfidResult result = rfidService.clearInventoy();
-        return objectMapper.writeValueAsString(result);
-    }
+    public RfidResult clearInventory(String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.clearInventoy();
+        return result;
+    }
+    //endregion
+
+    //region Reeader Parameter Settings
+
+    //#endregion
+
+    //region TagOperation
     @RequestMapping("/tagop/read")
     @ResponseBody
     @SneakyThrows
-    public String tagOpRead(int antID, int bankID, int bankStart, int blockNum, String pwd, short timeout) {
+    public RfidResult tagOpRead(String ipAddr, int antID, int bankID, int bankStart, int blockNum, String pwd, short timeout) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
         RfidResult result = rfidService.tagOpRead(antID, bankID, bankStart, blockNum, pwd, timeout);
-        return objectMapper.writeValueAsString(result);
+        return result;
     }
 
     @RequestMapping("/tagop/write")
     @ResponseBody
     @SneakyThrows
-    public String tagOpWrite(int antID, int bankID, int bankStart, String pwd, String data, short timeout) {
+    public RfidResult tagOpWrite(String ipAddr, int antID, int bankID, int bankStart, String pwd, String data, short timeout) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
         RfidResult result = rfidService.tagOpWrite(antID, bankID, bankStart, pwd, data, timeout);
-        return objectMapper.writeValueAsString(result);
+        return result;
     }
 
     @RequestMapping("/tagop/writeEPC")
     @ResponseBody
     @SneakyThrows
-    public String tagOpWriteEPC(int antID, String pwd, String data, short timeout) {
+    public RfidResult tagOpWriteEPC(String ipAddr, int antID, String pwd, String data, short timeout) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
         RfidResult result = rfidService.tagOpWriteEPC(antID, pwd, data, timeout);
-        return objectMapper.writeValueAsString(result);
+        return result;
     }
 
     @RequestMapping("/tagop/startRead")
     @ResponseBody
     @SneakyThrows
-    public String tagOpStartRead(int antID, int bankID, int bankStart, int blockNum, String pwd, short timeout, boolean isUnique) {
+    public RfidResult tagOpStartRead(String ipAddr, int antID, int bankID, int bankStart, int blockNum, String pwd, short timeout, boolean isUnique) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
         RfidResult result = rfidService.tagOpStartRead(antID, bankID, bankStart, blockNum, pwd, timeout, isUnique);
-        return objectMapper.writeValueAsString(result);
+        return result;
     }
 
     @RequestMapping("/tagop/stopRead")
     @ResponseBody
     @SneakyThrows
-    public String tagOpStopRead() {
+    public RfidResult tagOpStopRead(String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
         RfidResult result = rfidService.tagOpStopRead();
-        return objectMapper.writeValueAsString(result);
+        return result;
     }
+    //endregion
 }

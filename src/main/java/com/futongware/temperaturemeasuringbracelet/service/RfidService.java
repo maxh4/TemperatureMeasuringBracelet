@@ -3,6 +3,7 @@ package com.futongware.temperaturemeasuringbracelet.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.futongware.temperaturemeasuringbracelet.entity.RfidResult;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import com.uhf.api.cls.Reader;
@@ -10,7 +11,7 @@ import com.uhf.api.cls.Reader.*;
 
 import java.util.*;
 
-@Service
+@Component
 public class RfidService {
 
     private ObjectMapper objectMapper = new ObjectMapper();
@@ -20,11 +21,11 @@ public class RfidService {
     public final static Integer TAG_TID_BANK = 2;
     public final static Integer TAG_USER_BANK = 3;
 
-    private static Reader reader = null;
-    private static Boolean isM6E = null;
-    private static Boolean isEth = null;
-    private static Integer[] ants;
-    private static Map<SL_TagProtocol, String> tagProtocolDic= new HashMap<SL_TagProtocol, String>() {{
+    private Reader reader = null;
+    private Boolean isM6E = null;
+    private Boolean isEth = null;
+    private Integer[] ants;
+    private Map<SL_TagProtocol, String> tagProtocolDic= new HashMap<SL_TagProtocol, String>() {{
         put(SL_TagProtocol.SL_TAG_PROTOCOL_GEN2, "gen2");
         put(SL_TagProtocol.SL_TAG_PROTOCOL_IPX256, "ipx256");
         put(SL_TagProtocol.SL_TAG_PROTOCOL_IPX64, "ipx64");
@@ -66,7 +67,7 @@ public class RfidService {
         }
     }
 
-    public boolean isConnected() {
+    public Boolean isConnected() {
         return reader != null;
     }
 
