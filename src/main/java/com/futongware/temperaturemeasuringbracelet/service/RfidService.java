@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.futongware.temperaturemeasuringbracelet.entity.RfidResult;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import com.uhf.api.cls.Reader;
 import com.uhf.api.cls.Reader.*;
@@ -34,6 +33,7 @@ public class RfidService {
         put(SL_TagProtocol.SL_TAG_PROTOCOL_NONE, "none");
     }};
 
+    //region Base Connection
     public RfidResult connectRfid(String ipAddr, Integer antCnt) {
         if (reader != null) {
             reader.CloseReader();
@@ -56,7 +56,7 @@ public class RfidService {
         for (int i = 0; i < antCnt; i++) {
             ants[i] = i + 1;
         }
-        setAntPowerConf("3000,3000,3000,3000", "3000,3000,3000,3000");
+        setAntPowerConf(new String[]{"3000", "3000", "3000", "3000"}, new String[]{"3000", "3000", "3000", "3000"});
         return new RfidResult().setErr(err);
     }
 
@@ -78,73 +78,87 @@ public class RfidService {
             return new RfidResult().setErr(err);
         return new RfidResult().setData(objectMapper.writeValueAsString(connAnts));
     }
+    //endregion
 
+    //region Reader Params Config
     public RfidResult getParams() throws JsonProcessingException {
         Map<String, Object> params = new HashMap<String, Object>();
         RfidResult result = new RfidResult();
 
-        // ip配置
+        //region ip配置
         if (isEth) {
             result = getIPInfo();
             if (result.getErr() != READER_ERR.MT_OK_ERR)
                 return result;
             params.put("IPInfo", result.getData());
         }
-        // 天线功率配置
+        //endregion
+        //region 天线功率配置
         result = getAntPowerConf();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("antPowerConf", objectMapper.writeValueAsString(result.getData()));
-        // Gen2Session
+        //endregion
+        //region Gen2Session
         result = getGen2Session();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("gen2Session", result.getData());
-        // 是否检查天线
+        //endregion
+        //region 是否检查天线
         result = getIsChkAnt();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("isChkAnt", result.getData());
-        // Gen2Qval
+        //endregion
+        //region Gen2Qval
         result = getGen2Qval();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("gen2Qval", result.getData());
-        // Gen2Writemode
+        //endregion
+        //region Gen2Writemode
         result = getGen2Writemode();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("gen2Writemode", result.getData());
-        // Gen2MaxEPCLen
+        //endregion
+        //region Gen2MaxEPCLen
         result = getGen2MaxEPCLen();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("gen2MaxEPCLen", result.getData());
-        // Gen2Target
+        //endregion
+        //region Gen2Target
         result = getGen2Target();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("gen2Target", result.getData());
-        // Gen2TagEncoding
+        //endregion
+        //region Gen2TagEncoding
         result = getGen2TagEncoding();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("gen2TagEncoding", result.getData());
-        // 天线唯一性
+        //endregion
+        //region 天线唯一性
         result = getUniqueByAnt();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("uniqueByAnt", result.getData());
-        // 附加数据唯一性
-        result = getUniqueByEMDData();
+        //endregion
+        //region 附加数据唯一性
+        result = getUniqueByEmdData();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("uniqueByEMDData", result.getData());
-        // 记录最大RSSI
+        //endregion
+        //region 记录最大RSSI
         result = getRecordHighestRSSI();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("recordHighestRSSI", result.getData());
+        //endregion
         return new RfidResult().setData(params);
     }
 
@@ -159,22 +173,20 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setAntPowerConf(String readPower, String writePower) {
+    public RfidResult setAntPowerConf(String[] readPowers, String[] writePowers) {
         // return error if no connections with reader
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
-        String[] readPowers = readPower.split(",");
-        String[] writePowers = writePower.split(",");
         int antCnt = readPowers.length;
         AntPowerConf antPowerConf = reader.new AntPowerConf();
-        for (int i=0; i<antCnt; i++) {
+        for (int i = 0; i < antCnt; i++) {
             AntPower power = reader.new AntPower();
-            power.antid = i+1;
-            if (!readPowers[i].equals(""))
+            power.antid = i + 1;
+            if (!readPowers[i].isEmpty())
                 power.readPower = Short.parseShort(readPowers[i]);
             else
                 power.readPower = 3000; // 3000dBM as default power
-            if (!writePowers[i].equals(""))
+            if (!writePowers[i].isEmpty())
                 power.writePower = Short.parseShort(writePowers[i]);
             else
                 power.writePower = 3000;
@@ -201,13 +213,13 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setIPInfo(Map<String, String> IPInfo) {
+    public RfidResult setIpInfo(Map<String, String> ipInfo) {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
         Reader_Ip readerIP = reader.new Reader_Ip();
-        readerIP.ip = IPInfo.get("ip").getBytes();
-        readerIP.mask = IPInfo.get("mask").getBytes();
-        readerIP.gateway = IPInfo.get("gateway").getBytes();
+        readerIP.ip = ipInfo.get("ip").getBytes();
+        readerIP.mask = ipInfo.get("mask").getBytes();
+        readerIP.gateway = ipInfo.get("gateway").getBytes();
         READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_READER_IP, readerIP);
         return new RfidResult().setErr(err);
     }
@@ -242,13 +254,13 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setGen2MaxEPCLen(int gen2MaxEPCLen) {
+    public RfidResult setGen2MaxEPCLen(int gen2MaxEpcLen) {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
         if (isM6E)
             return new RfidResult().setErr(READER_ERR.MT_OP_NOT_SUPPORTED);
-        int[] gen2MaxEPCLen_ = new int[] {gen2MaxEPCLen};
-        READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_POTL_GEN2_MAXEPCLEN, gen2MaxEPCLen);
+        int[] gen2MaxEPCLen_ = new int[] {gen2MaxEpcLen};
+        READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_POTL_GEN2_MAXEPCLEN, gen2MaxEpcLen);
         return new RfidResult().setErr(err);
     }
 
@@ -406,7 +418,7 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult getUniqueByEMDData() {
+    public RfidResult getUniqueByEmdData() {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
         int[] isMultiple = new int[1];
@@ -417,7 +429,7 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setUniqueByEMDData(int isMultiple) {
+    public RfidResult setUniqueByEmdData(int isMultiple) {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
         int[] isMultiple_ = new int[] {isMultiple};
@@ -443,7 +455,9 @@ public class RfidService {
         READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_TAGDATA_RECORDHIGHESTRSSI, isNotRecord_);
         return new RfidResult().setErr(err);
     }
+    //endregion
 
+    //region Inventory
     private Map<String, Map> tagMap = new LinkedHashMap<String, Map>();
 
     private Thread tagThread = new Thread(new Runnable() {
@@ -533,7 +547,9 @@ public class RfidService {
         tagMap.clear();
         return new RfidResult();
     }
+    //endregion
 
+    //region Tag Operation
     public RfidResult getTagFilter() throws JsonProcessingException {
         TagFilter_ST tagFilter = reader.new TagFilter_ST();
         READER_ERR err = reader.ParamGet(Mtr_Param.MTR_PARAM_TAG_FILTER, tagFilter);
@@ -563,14 +579,14 @@ public class RfidService {
      * @param data 过滤数据
      * @param isNotInvert 是否匹配
      * @param bankStart bank起始地址
-     * @param bankID 过滤bank
+     * @param bankId 过滤bank
      * @return
      */
-    public RfidResult setTagFilter(String data, boolean isNotInvert, int bankStart, int bankID) {
+    public RfidResult setTagFilter(String data, boolean isNotInvert, int bankStart, int bankId) {
         // 建立过滤器
         TagFilter_ST tagFilter = reader.new TagFilter_ST();
         // 过滤bank
-        tagFilter.bank = bankID;
+        tagFilter.bank = bankId;
         // 过滤数据
         byte[] datab = new byte[data.length()/2];
         reader.Str2Hex(data, data.length(), datab);
@@ -786,5 +802,5 @@ public class RfidService {
             return result;
         return new RfidResult();
     }
-
+    //endregion
 }
