@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.futongware.temperaturemeasuringbracelet.entity.RfidResult;
 import com.futongware.temperaturemeasuringbracelet.service.RfidService;
 import com.uhf.api.cls.Reader.*;
+import io.swagger.annotations.Api;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/rfid")
+@Api(value = "RFID")
 public class RfidController {
 
     private ObjectMapper objectMapper = new ObjectMapper();
