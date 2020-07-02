@@ -118,13 +118,13 @@ public class RfidService {
         params.put("gen2Qval", result.getData());
         //endregion
         //region Gen2Writemode
-        result = getGen2Writemode();
+        result = getGen2WriteMode();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("gen2Writemode", result.getData());
         //endregion
         //region Gen2MaxEPCLen
-        result = getGen2MaxEPCLen();
+        result = getGen2MaxEpcLen();
         if (result.getErr() != READER_ERR.MT_OK_ERR)
             return result;
         params.put("gen2MaxEPCLen", result.getData());
@@ -243,7 +243,7 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult getGen2MaxEPCLen() {
+    public RfidResult getGen2MaxEpcLen() {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
         int[] gen2MaxEPCLen = new int[1];
@@ -254,7 +254,7 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setGen2MaxEPCLen(int gen2MaxEpcLen) {
+    public RfidResult setGen2MaxEpcLen(int gen2MaxEpcLen) {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
         if (isM6E)
@@ -323,7 +323,7 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult getGen2Writemode() {
+    public RfidResult getGen2WriteMode() {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
         int[] gen2Writemode = new int[1];
@@ -334,7 +334,7 @@ public class RfidService {
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setGen2Writemode(int gen2Writemode) {
+    public RfidResult setGen2WriteMode(int gen2Writemode) {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
         int[] gen2Writemode_ = new int[] {gen2Writemode};
@@ -402,57 +402,57 @@ public class RfidService {
     public RfidResult getUniqueByAnt() {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
-        int[] isMultiple = new int[1];
-        READER_ERR err = reader.ParamGet(Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYANT, isMultiple);
+        int[] uniqueByAnt_ = new int[1];
+        READER_ERR err = reader.ParamGet(Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYANT, uniqueByAnt_);
         if (err == READER_ERR.MT_OK_ERR) {
-            return new RfidResult().setData(isMultiple[0]);
+            return new RfidResult().setData(uniqueByAnt_[0]);
         }
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setUniqueByAnt(int isMultiple) {
+    public RfidResult setUniqueByAnt(int uniqueByAnt) {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
-        int[] isMultiple_ = new int[] {isMultiple};
-        READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYANT, isMultiple_);
+        int[] uniqueByAnt_ = new int[] {uniqueByAnt};
+        READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYANT, uniqueByAnt_);
         return new RfidResult().setErr(err);
     }
 
     public RfidResult getUniqueByEmdData() {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
-        int[] isMultiple = new int[1];
-        READER_ERR err = reader.ParamGet(Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYEMDDATA, isMultiple);
+        int[] uniqueByEmdData_ = new int[1];
+        READER_ERR err = reader.ParamGet(Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYEMDDATA, uniqueByEmdData_);
         if (err == READER_ERR.MT_OK_ERR) {
-            return new RfidResult().setData(isMultiple[0]);
+            return new RfidResult().setData(uniqueByEmdData_[0]);
         }
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setUniqueByEmdData(int isMultiple) {
+    public RfidResult setUniqueByEmdData(int uniqueByEmdData) {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
-        int[] isMultiple_ = new int[] {isMultiple};
-        READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYEMDDATA, isMultiple_);
+        int[] uniqueByEmdData_ = new int[] {uniqueByEmdData};
+        READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_TAGDATA_UNIQUEBYEMDDATA, uniqueByEmdData_);
         return new RfidResult().setErr(err);
     }
 
     public RfidResult getRecordHighestRSSI() {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
-        int[] isNotRecord = new int[1];
-        READER_ERR err = reader.ParamGet(Mtr_Param.MTR_PARAM_TAGDATA_RECORDHIGHESTRSSI, isNotRecord);
+        int[] recordHighestRSSI_ = new int[1];
+        READER_ERR err = reader.ParamGet(Mtr_Param.MTR_PARAM_TAGDATA_RECORDHIGHESTRSSI, recordHighestRSSI_);
         if (err == READER_ERR.MT_OK_ERR) {
-            return new RfidResult().setData(isNotRecord[0]);
+            return new RfidResult().setData(recordHighestRSSI_[0]);
         }
         return new RfidResult().setErr(err);
     }
 
-    public RfidResult setRecordHighestRSSI(int isNotRecord) {
+    public RfidResult setRecordHighestRSSI(int recordHighestRSSI) {
         if (reader == null)
             return new RfidResult().setErr(READER_ERR.MT_IO_ERR);
-        int[] isNotRecord_ = new int[] {isNotRecord};
-        READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_TAGDATA_RECORDHIGHESTRSSI, isNotRecord_);
+        int[] recordHighestRSSI_ = new int[] {recordHighestRSSI};
+        READER_ERR err = reader.ParamSet(Mtr_Param.MTR_PARAM_TAGDATA_RECORDHIGHESTRSSI, recordHighestRSSI_);
         return new RfidResult().setErr(err);
     }
     //endregion

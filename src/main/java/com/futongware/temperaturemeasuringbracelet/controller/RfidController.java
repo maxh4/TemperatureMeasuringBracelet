@@ -1,6 +1,5 @@
 package com.futongware.temperaturemeasuringbracelet.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.futongware.temperaturemeasuringbracelet.annotation.MultiRequestBody;
 import com.futongware.temperaturemeasuringbracelet.entity.RfidResult;
@@ -10,13 +9,9 @@ import io.swagger.annotations.Api;
 import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -205,27 +200,27 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2MaxEPCLen", method = RequestMethod.GET)
+    @RequestMapping(value = "/{address}/readerParam/gen2MaxEpcLen", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
-    public RfidResult getGen2MaxEPCLen(@PathVariable(value = "address") String ipAddr) {
+    public RfidResult getGen2MaxEpcLen(@PathVariable(value = "address") String ipAddr) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.getGen2MaxEPCLen();
+        RfidResult result = rfidService.getGen2MaxEpcLen();
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2MaxEPCLen", method = RequestMethod.POST)
+    @RequestMapping(value = "/{address}/readerParam/gen2MaxEpcLen", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2MaxEPCLen(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2MaxEpcLen) {
+    public RfidResult setGen2MaxEpcLen(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2MaxEpcLen) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.setGen2MaxEPCLen(gen2MaxEpcLen);
+        RfidResult result = rfidService.setGen2MaxEpcLen(gen2MaxEpcLen);
         return result;
     }
 
@@ -301,27 +296,27 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2Writemode", method = RequestMethod.GET)
+    @RequestMapping(value = "/{address}/readerParam/gen2WriteMode", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
-    public RfidResult getGen2Writemode(@PathVariable(value = "address") String ipAddr) {
+    public RfidResult getGen2WriteMode(@PathVariable(value = "address") String ipAddr) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.getGen2Writemode();
+        RfidResult result = rfidService.getGen2WriteMode();
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2Writemode", method = RequestMethod.POST)
+    @RequestMapping(value = "/{address}/readerParam/gen2WriteMode", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2Writemode(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2Writemode) {
+    public RfidResult setGen2WriteMode(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2WriteMode) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.setGen2Writemode(gen2Writemode);
+        RfidResult result = rfidService.setGen2WriteMode(gen2WriteMode);
         return result;
     }
 
@@ -412,12 +407,12 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/uniqueByAnt", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setUniqueByAnt(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int isMultiple) {
+    public RfidResult setUniqueByAnt(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int uniqueByAnt) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.setUniqueByAnt(isMultiple);
+        RfidResult result = rfidService.setUniqueByAnt(uniqueByAnt);
         return result;
     }
 
@@ -436,12 +431,12 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/uniqueByEmdData", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setUniqueByEmdData(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int isMultiple) {
+    public RfidResult setUniqueByEmdData(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int uniqueByEmdData) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.setUniqueByEmdData(isMultiple);
+        RfidResult result = rfidService.setUniqueByEmdData(uniqueByEmdData);
         return result;
     }
 
@@ -460,12 +455,12 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/recordHighestRSSI", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setRecordHighestRSSI(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int isNotRecord) {
+    public RfidResult setRecordHighestRSSI(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int recordHighestRSSI) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.setRecordHighestRSSI(isNotRecord);
+        RfidResult result = rfidService.setRecordHighestRSSI(recordHighestRSSI);
         return result;
     }
 
