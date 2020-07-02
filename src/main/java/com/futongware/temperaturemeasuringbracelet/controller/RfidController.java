@@ -2,6 +2,7 @@ package com.futongware.temperaturemeasuringbracelet.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.futongware.temperaturemeasuringbracelet.annotation.MultiRequestBody;
 import com.futongware.temperaturemeasuringbracelet.entity.RfidResult;
 import com.futongware.temperaturemeasuringbracelet.service.RfidService;
 import com.uhf.api.cls.Reader.*;
@@ -28,7 +29,7 @@ public class RfidController {
     private Map<String, RfidService> connectedReaderMap = new HashMap<>();
 
     //region BaseOperation
-    @RequestMapping(value = "/{address}/connect", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/connect", method = RequestMethod.GET)
     @ResponseBody
     public RfidResult connectRfid(@PathVariable(value = "address") String ipAddr, Integer antCnt) {
         if (!connectedReaderMap.containsKey(ipAddr) || connectedReaderMap.get(ipAddr) == null)
@@ -43,7 +44,7 @@ public class RfidController {
      * Disconnect RFID Reader
      * @return
      */
-    @RequestMapping(value = "/{address}/disconnect", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/disconnect", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult disconnectRfid(@PathVariable(value = "address") String ipAddr) {
@@ -55,7 +56,7 @@ public class RfidController {
         return new RfidResult();
     }
 
-    @RequestMapping(value = "/{address}/isConnected", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/isConnected", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult isConnected(@PathVariable(value = "address") String ipAddr) {
@@ -70,7 +71,7 @@ public class RfidController {
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
     }
 
-    @RequestMapping(value = "/{address}/checkAnts", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/checkAnts", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult checkConnectedAnts(@PathVariable(value = "address") String ipAddr) {
@@ -82,7 +83,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/startInventory", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/startInventory", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult startInventory(@PathVariable(value = "address") String ipAddr) {
@@ -94,7 +95,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/stopInventory", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/stopInventory", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult stopInventory(@PathVariable(value = "address") String ipAddr) {
@@ -106,7 +107,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/clearInventory", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/clearInventory", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult clearInventory(@PathVariable(value = "address") String ipAddr) {
@@ -120,7 +121,7 @@ public class RfidController {
     //endregion
 
     //region Reeader Parameter Settings
-    @RequestMapping(value = "/{address}/readerParam", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getReaderParams(@PathVariable(value = "address") String ipAddr) {
@@ -132,7 +133,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/antPowerConf", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/antPowerConf", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getAntPowerConf(@PathVariable(value = "address") String ipAddr) {
@@ -147,7 +148,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/antPowerConf", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setAntPowerConf(@PathVariable(value = "address") String ipAddr, String[] readPowers, String[] writePowers) {
+    public RfidResult setAntPowerConf(@PathVariable(value = "address") String ipAddr, @MultiRequestBody String[] readPowers, @MultiRequestBody String[] writePowers) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -156,7 +157,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/ipInfo", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/ipInfo", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getIpInfo(@PathVariable(value = "address") String ipAddr) {
@@ -171,7 +172,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/ipInfo", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setIpInfo(@PathVariable(value = "address") String ipAddr, @NotNull Map<String, String> ipInfo) {
+    public RfidResult setIpInfo(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @NotNull Map<String, String> ipInfo) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -180,7 +181,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/isCheckAnt", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/isCheckAnt", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getIsCheckAnt(@PathVariable(value = "address") String ipAddr) {
@@ -195,7 +196,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/isCheckAnt", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setIsCheckAnt(@PathVariable(value = "address") String ipAddr, int isCheckAnt) {
+    public RfidResult setIsCheckAnt(@PathVariable(value = "address") String ipAddr, @MultiRequestBody int isCheckAnt) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -204,7 +205,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2MaxEPCLen", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/gen2MaxEPCLen", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getGen2MaxEPCLen(@PathVariable(value = "address") String ipAddr) {
@@ -219,7 +220,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/gen2MaxEPCLen", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2MaxEPCLen(@PathVariable(value = "address") String ipAddr, @Min(0) int gen2MaxEpcLen) {
+    public RfidResult setGen2MaxEPCLen(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2MaxEpcLen) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -228,7 +229,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2Session", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/gen2Session", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getGen2Session(@PathVariable(value = "address") String ipAddr) {
@@ -243,7 +244,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/gen2Session", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2Session(@PathVariable(value = "address") String ipAddr, @Min(0) int gen2Session) {
+    public RfidResult setGen2Session(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2Session) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -252,7 +253,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2Qval", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/gen2Qval", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getGen2Qval(@PathVariable(value = "address") String ipAddr) {
@@ -267,7 +268,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/gen2Qval", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2Qval(@PathVariable(value = "address") String ipAddr, @Min(0) int gen2Qval) {
+    public RfidResult setGen2Qval(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2Qval) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -276,7 +277,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2TagEncoding", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/gen2TagEncoding", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getGen2TagEncoding(@PathVariable(value = "address") String ipAddr) {
@@ -291,7 +292,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/gen2TagEncoding", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2TagEncoding(@PathVariable(value = "address") String ipAddr, @Min(0) int gen2TagEncoding) {
+    public RfidResult setGen2TagEncoding(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2TagEncoding) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -300,7 +301,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2Writemode", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/gen2Writemode", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getGen2Writemode(@PathVariable(value = "address") String ipAddr) {
@@ -315,7 +316,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/gen2Writemode", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2Writemode(@PathVariable(value = "address") String ipAddr, @Min(0) int gen2Writemode) {
+    public RfidResult setGen2Writemode(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2Writemode) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -324,7 +325,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2Target", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/gen2Target", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getGen2Target(@PathVariable(value = "address") String ipAddr) {
@@ -339,7 +340,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/gen2Target", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2Target(@PathVariable(value = "address") String ipAddr, @Min(0) int gen2Target) {
+    public RfidResult setGen2Target(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2Target) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -348,7 +349,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2BLF", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/gen2BLF", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getGen2BLF(@PathVariable(value = "address") String ipAddr) {
@@ -363,7 +364,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/gen2BLF", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2BLF(@PathVariable(value = "address") String ipAddr, @Min(0) int gen2BLF) {
+    public RfidResult setGen2BLF(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2BLF) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -372,7 +373,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/gen2Tari", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/gen2Tari", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getGen2Tari(@PathVariable(value = "address") String ipAddr) {
@@ -387,7 +388,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/gen2Tari", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setGen2Tari(@PathVariable(value = "address") String ipAddr, @Min(0) int gen2Tari) {
+    public RfidResult setGen2Tari(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int gen2Tari) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -396,7 +397,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/uniqueByAnt", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/uniqueByAnt", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getUniqueByAnt(@PathVariable(value = "address") String ipAddr) {
@@ -411,7 +412,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/uniqueByAnt", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setUniqueByAnt(@PathVariable(value = "address") String ipAddr, @Min(0) int isMultiple) {
+    public RfidResult setUniqueByAnt(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int isMultiple) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -420,7 +421,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/uniqueByEmdData", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/uniqueByEmdData", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getUniqueByEmdData(@PathVariable(value = "address") String ipAddr) {
@@ -435,7 +436,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/uniqueByEmdData", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setUniqueByEmdData(@PathVariable(value = "address") String ipAddr, @Min(0) int isMultiple) {
+    public RfidResult setUniqueByEmdData(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int isMultiple) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -444,7 +445,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/readerParam/recordHighestRSSI", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/readerParam/recordHighestRSSI", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult getRecordHighestRSSI(@PathVariable(value = "address") String ipAddr) {
@@ -459,7 +460,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/readerParam/recordHighestRSSI", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult setRecordHighestRSSI(@PathVariable(value = "address") String ipAddr, @Min(0) int isNotRecord) {
+    public RfidResult setRecordHighestRSSI(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int isNotRecord) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -471,7 +472,7 @@ public class RfidController {
     //#endregion
 
     //region TagOperation
-    @RequestMapping(value = "/{address}/tagop/filter", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/tagop/filter", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult tagOpGetTagFilter(@PathVariable(value = "address") String ipAddr) {
@@ -486,7 +487,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/tagop/filter", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult tagOpSetTagFilter(@PathVariable(value = "address") String ipAddr, String data, boolean isNotInvert, int bankStart, int bankId) {
+    public RfidResult tagOpSetTagFilter(@PathVariable(value = "address") String ipAddr, @MultiRequestBody String data, @MultiRequestBody boolean isNotInvert, @MultiRequestBody int bankStart, int bankId) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -498,7 +499,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/tagop/read", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult tagOpRead(@PathVariable(value = "address") String ipAddr, int antID, int bankID, int bankStart, int blockNum, String pwd, short timeout) {
+    public RfidResult tagOpRead(@PathVariable(value = "address") String ipAddr, @MultiRequestBody int antID, @MultiRequestBody int bankID, @MultiRequestBody int bankStart, @MultiRequestBody int blockNum, @MultiRequestBody String pwd, @MultiRequestBody short timeout) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -510,7 +511,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/tagop/write", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult tagOpWrite(@PathVariable(value = "address") String ipAddr, int antID, int bankID, int bankStart, String pwd, String data, short timeout) {
+    public RfidResult tagOpWrite(@PathVariable(value = "address") String ipAddr, @MultiRequestBody int antID, @MultiRequestBody int bankID, @MultiRequestBody int bankStart, @MultiRequestBody String pwd, @MultiRequestBody String data, @MultiRequestBody short timeout) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -522,7 +523,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/tagop/writeEPC", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult tagOpWriteEPC(@PathVariable(value = "address") String ipAddr, int antID, String pwd, String data, short timeout) {
+    public RfidResult tagOpWriteEPC(@PathVariable(value = "address") String ipAddr, @MultiRequestBody int antID, @MultiRequestBody String pwd, @MultiRequestBody String data, @MultiRequestBody short timeout) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -534,7 +535,7 @@ public class RfidController {
     @RequestMapping(value = "/{address}/tagop/startRead", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult tagOpStartRead(@PathVariable(value = "address") String ipAddr, int antID, int bankID, int bankStart, int blockNum, String pwd, short timeout, boolean isUnique) {
+    public RfidResult tagOpStartRead(@PathVariable(value = "address") String ipAddr, @MultiRequestBody int antID, @MultiRequestBody int bankID, @MultiRequestBody int bankStart, @MultiRequestBody int blockNum, @MultiRequestBody String pwd, @MultiRequestBody short timeout, @MultiRequestBody boolean isUnique) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
@@ -543,7 +544,7 @@ public class RfidController {
         return result;
     }
 
-    @RequestMapping(value = "/{address}/tagop/stopRead", method = { RequestMethod.GET, RequestMethod.POST })
+    @RequestMapping(value = "/{address}/tagop/stopRead", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
     public RfidResult tagOpStopRead(@PathVariable(value = "address") String ipAddr) {
