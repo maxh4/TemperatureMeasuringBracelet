@@ -3,6 +3,7 @@ package com.futongware.temperaturemeasuringbracelet.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NumericNode;
 import com.futongware.temperaturemeasuringbracelet.annotation.MultiRequestBody;
 import lombok.SneakyThrows;
 import org.apache.commons.io.IOUtils;
@@ -181,7 +182,7 @@ public class MultiRequestBodyArgumentResolver implements HandlerMethodArgumentRe
      */
     private Object parseBasicTypeWrapper(Class<?> parameterType, Object value) {
         if (Number.class.isAssignableFrom(parameterType)) {
-            Number number = (Number) value;
+            NumericNode number = (NumericNode) value;
             if (parameterType == Integer.class) {
                 return number.intValue();
             } else if (parameterType == Short.class) {
@@ -193,7 +194,7 @@ public class MultiRequestBodyArgumentResolver implements HandlerMethodArgumentRe
             } else if (parameterType == Double.class) {
                 return number.doubleValue();
             } else if (parameterType == Byte.class) {
-                return number.byteValue();
+                return (byte) number.intValue();
             }
         } else if (parameterType == Boolean.class) {
             return value.toString();

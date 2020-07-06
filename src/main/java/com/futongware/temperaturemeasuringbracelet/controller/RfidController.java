@@ -3,16 +3,22 @@ package com.futongware.temperaturemeasuringbracelet.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.futongware.temperaturemeasuringbracelet.annotation.MultiRequestBody;
 import com.futongware.temperaturemeasuringbracelet.entity.RfidResult;
+import com.futongware.temperaturemeasuringbracelet.entity.TagInfo;
 import com.futongware.temperaturemeasuringbracelet.service.RfidService;
 import com.uhf.api.cls.Reader.*;
 import io.swagger.annotations.Api;
 import lombok.SneakyThrows;
+import org.springframework.messaging.handler.annotation.MessageMapping;
+import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/rfid")
@@ -98,7 +104,7 @@ public class RfidController {
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.stopInventoy();
+        RfidResult result = rfidService.stopInventory();
         return result;
     }
 
@@ -113,9 +119,57 @@ public class RfidController {
         RfidResult result = rfidService.clearInventoy();
         return result;
     }
+
+    @RequestMapping(value = "/{address}/startTagInventory", method = RequestMethod.POST)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult startTagInventory(@PathVariable(value = "address") String ipAddr,
+                                        @MultiRequestBody Integer[] selectedAnts,
+                                        @MultiRequestBody @Min(0) Short timeout) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.startTagInventory(selectedAnts, timeout);
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/stopTagInventory", method = RequestMethod.GET)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult stopTagInventory(@PathVariable(value = "address") String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.stopTagInventory();
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/clearTagInventory", method = RequestMethod.GET)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult clearTagInventory(@PathVariable(value = "address") String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.clearTagInventory();
+        return result;
+    }
+
+    @MessageMapping("/rfid/inventory")
+    @SendTo("/topic/inventory")
+    public Map<String, TagInfo> getTagInventoryInfo(String ipAddr) throws Exception {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return null;
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        return rfidService.getTagInfoMap();
+    }
     //endregion
 
-    //region Reeader Parameter Settings
+    //region Reader Parameter Settings
     @RequestMapping(value = "/{address}/readerParam", method = RequestMethod.GET)
     @ResponseBody
     @SneakyThrows
@@ -148,8 +202,15 @@ public class RfidController {
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.setAntPowerConf(readPowers, writePowers);
-        return result;
+        try {
+            List<Short> readPowerList = Stream.of(readPowers).map(e -> Short.parseShort(e)).collect(Collectors.toList());
+            List<Short> writePowerList = Stream.of(writePowers).map(e -> Short.parseShort(e)).collect(Collectors.toList());
+            RfidResult result = rfidService.setAntPowerConf(readPowerList.toArray(new Short[readPowerList.size()]), writePowerList.toArray(new Short[writePowerList.size()]));
+            return result;
+        }
+        catch (Exception e) {
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+        }
     }
 
     @RequestMapping(value = "/{address}/readerParam/ipInfo", method = RequestMethod.GET)
@@ -464,6 +525,89 @@ public class RfidController {
         return result;
     }
 
+    @RequestMapping(value = "/{address}/readerParam/iso180006bModulationDepth", method = RequestMethod.GET)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult getIso180006bModulationDepth(@PathVariable(value = "address") String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.getRecordHighestRSSI();
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/readerParam/iso180006bModulationDepth", method = RequestMethod.POST)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult setIso180006bModulationDepth(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int iso180006bModulationDepth) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.setIso180006bModulationDepth(iso180006bModulationDepth);
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/readerParam/iso180006bDelimiter", method = RequestMethod.GET)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult getIso180006bDelimiter(@PathVariable(value = "address") String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.getRecordHighestRSSI();
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/readerParam/iso180006bDelimiter", method = RequestMethod.POST)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult setIso180006bDelimiter(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int iso180006bDelimiter) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.setIso180006bDelimiter(iso180006bDelimiter);
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/readerParam/supportedRegions", method = RequestMethod.GET)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult getSupportedRegions(@PathVariable(value = "address") String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.getRecordHighestRSSI();
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/readerParam/supportedRegions", method = RequestMethod.POST)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult setSupportedRegions(@PathVariable(value = "address") String ipAddr, @MultiRequestBody @Min(0) int supportedRegions) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.setRecordHighestRSSI(supportedRegions);
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/readerParam/readerTemperature", method = RequestMethod.GET)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult getReaderTemperature(@PathVariable(value = "address") String ipAddr) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        RfidResult result = rfidService.getReaderTemperature();
+        return result;
+    }
     //#endregion
 
     //region TagOperation
@@ -530,12 +674,12 @@ public class RfidController {
     @RequestMapping(value = "/{address}/tagop/startRead", method = RequestMethod.POST)
     @ResponseBody
     @SneakyThrows
-    public RfidResult tagOpStartRead(@PathVariable(value = "address") String ipAddr, @MultiRequestBody int antID, @MultiRequestBody int bankID, @MultiRequestBody int bankStart, @MultiRequestBody int blockNum, @MultiRequestBody String pwd, @MultiRequestBody short timeout, @MultiRequestBody boolean isUnique) {
+    public RfidResult tagOpStartRead(@PathVariable(value = "address") String ipAddr, @MultiRequestBody int antId, @MultiRequestBody int bankId, @MultiRequestBody int bankStart, @MultiRequestBody int blockNum, @MultiRequestBody String pwd, @MultiRequestBody short timeout, @MultiRequestBody boolean isUnique) {
         if (!connectedReaderMap.containsKey(ipAddr))
             return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
-        RfidResult result = rfidService.tagOpStartRead(antID, bankID, bankStart, blockNum, pwd, timeout, isUnique);
+        RfidResult result = rfidService.tagOpStartRead(antId, bankId, bankStart, blockNum, pwd, timeout, isUnique);
         return result;
     }
 
@@ -548,6 +692,29 @@ public class RfidController {
 
         RfidService rfidService = connectedReaderMap.get(ipAddr);
         RfidResult result = rfidService.tagOpStopRead();
+        return result;
+    }
+
+    @RequestMapping(value = "/{address}/tagop/readTagTemperature", method = RequestMethod.POST)
+    @ResponseBody
+    @SneakyThrows
+    public RfidResult tagOpReadTagTemperature(@PathVariable(value = "address") String ipAddr,
+                                              @MultiRequestBody Integer antId,
+                                              @MultiRequestBody Integer bankId,
+                                              @MultiRequestBody Integer bankStart,
+                                              @MultiRequestBody Integer blockNum,
+                                              @MultiRequestBody Integer readTime,
+                                              @MultiRequestBody(required = false) Integer selWaitTime,
+                                              @MultiRequestBody(required = false) Integer readWaitTime,
+                                              @MultiRequestBody Boolean[] metaDataCheckGroup,
+                                              @MultiRequestBody(required = false) String accessPwd) {
+        if (!connectedReaderMap.containsKey(ipAddr))
+            return new RfidResult().setErr(READER_ERR.MT_CMD_FAILED_ERR);
+
+        RfidService rfidService = connectedReaderMap.get(ipAddr);
+        selWaitTime = selWaitTime == null ? 0 : selWaitTime;
+        readWaitTime = readWaitTime == null ? 0 : readWaitTime;
+        RfidResult result = rfidService.tagOpReadTagTemperature(antId, bankId, bankStart, blockNum, readTime, selWaitTime, readWaitTime, metaDataCheckGroup, accessPwd);
         return result;
     }
     //endregion
